@@ -108,8 +108,8 @@ for frame_idx=1:nb_frames
                     Wp(ch,:,k) = Wtmp';%%%
                 end
             end
-        end%%%channel的end
-        %%%迭代的end
+        end%%%
+        %%%
         %     else
         %         Wp(:,:,k)= Wp(:,:,k-1);
         %     end
