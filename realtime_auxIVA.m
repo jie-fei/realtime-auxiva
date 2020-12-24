@@ -31,7 +31,7 @@ y_frame_old     = zeros(frame_size,channel);
 win             = sqrt(hanning(FFT_size,'periodic'));
 X_frame         = zeros(FFT_bins,channel);
 Gain            = ones(FFT_bins,channel);
-bins_70hz       = floor(70/(fs/FFT_size));%思考清楚这里是为什么这么算
+bins_70hz       = floor(70/(fs/FFT_size));%
 Y_frame_out=zeros(FFT_bins,channel);
 Wp=zeros(channel,channel,FFT_bins);%%%
 for k=1:FFT_bins
@@ -45,12 +45,12 @@ V_smooth_old1=zeros(channel,channel,FFT_bins);
 V_smooth_old2=zeros(channel,channel,FFT_bins);
 V_smooth=zeros(channel,channel,FFT_bins);
 aifa=0.95;
-r=zeros(1,channel);%%%行是通道 列是源
+r=zeros(1,channel);%%%
 conX=zeros(channel,channel,FFT_bins);
 energy_iva=zeros(nb_frames,channel);%%
 %----------------------------frame loop start------------------------------
 for frame_idx=1:nb_frames
-    fprintf('%d / %d \n',frame_idx,nb_frames);%%处理到哪一帧
+    fprintf('%d / %d \n',frame_idx,nb_frames);%%
     pos      = frame_size * (frame_idx-1) + 1;
     % 50%overlap and window
     x_new          = x(pos:pos+frame_size-1,:);
@@ -63,19 +63,19 @@ for frame_idx=1:nb_frames
     X_frame        = temp(1:FFT_bins,:);
     
     %Do process
-    Gain(1:bins_70hz)=0.01;%通过输出信号的语谱观察这个处理的作用
+    Gain(1:bins_70hz)=0.01;%
     X_frame = X_frame.*Gain;
     for k=1:FFT_bins
-        Y_frame_out(k,:) = Wp(:,:,k)*X_frame(k,:).';%%%%%fixed 取出来每一帧
+        Y_frame_out(k,:) = Wp(:,:,k)*X_frame(k,:).';%%%%%
     end
 
-    Power_frame = max(abs(Y_frame_out).^2,eps).';%%%%为什么取max
+    Power_frame = max(abs(Y_frame_out).^2,eps).';%%%%
     sumP2_freq = squeeze(sum(Power_frame,2));
     coffs = sumP2_freq .^(-1); %%% G'/r %%for Aux_iva; coffs = 2 * sumP2_freq .^(-2/3) / 3;
-    coffs = 2 * sumP2_freq .^(-2/3) / 3;%%%%把它用上
+    coffs = 2 * sumP2_freq .^(-2/3) / 3;%%%%
     %%
     for k=1:FFT_bins
-        conX(:,:,k)=X_frame(k,:).'*conj(X_frame(k,:));%%%%fixed就是这里终于找到了
+        conX(:,:,k)=X_frame(k,:).'*conj(X_frame(k,:));%%%%
     end
     %         if flag == 1
     for iter=1:iter_num
@@ -85,7 +85,7 @@ for frame_idx=1:nb_frames
             Gr=1./(r(:,ch)+epsi);
 %             Gr=coffs(ch);
             for k=1:FFT_bins
-                V_new=Gr.*conX(:,:,k);% 如何帧间更新 对当前帧的操作
+                V_new=Gr.*conX(:,:,k);% 
                 if(ch==1)
                     V_smooth(:,:,k)=aifa.*V_smooth_old1(:,:,k)+(1-aifa).*V_new;
                 else
@@ -105,11 +105,11 @@ for frame_idx=1:nb_frames
                     Vtmp=V_smooth(:,:,k);%%%%
                     Wtmp = pinv(Wp(:,:,k)*Vtmp+1e-5*eye(ch))*e(:,ch);
                     Wtmp = Wtmp / sqrt(Wtmp' * Vtmp * Wtmp);
-                    Wp(ch,:,k) = Wtmp';%%%重要 channel和source不要弄混 共轭转置是因为公式 所以前面W*X的时候W就没共轭转置 %%%Wp(:,ch,k) = Wtmp;%%%错误示例
+                    Wp(ch,:,k) = Wtmp';%%%
                 end
             end
-        end%%%channel的end
-        %%%迭代的end
+        end%%%channel鐨別nd
+        %%%杩唬鐨別nd
         %     else
         %         Wp(:,:,k)= Wp(:,:,k-1);
         %     end
